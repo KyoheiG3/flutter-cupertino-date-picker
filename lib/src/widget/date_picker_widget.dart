@@ -19,6 +19,7 @@ const List<int> _solarMonthsOf31Days = const <int>[1, 3, 5, 7, 8, 10, 12];
 class DatePickerWidget extends StatefulWidget {
   DatePickerWidget({
     Key key,
+    this.looping = false,
     this.onMonthChangeStartWithFirstDate = false,
     this.minDateTime,
     this.maxDateTime,
@@ -35,6 +36,7 @@ class DatePickerWidget extends StatefulWidget {
     assert(minTime.compareTo(maxTime) < 0);
   }
 
+  final bool looping;
   final DateTime minDateTime, maxDateTime, initialDateTime;
   final String dateFormat;
   final DateTimePickerLocale locale;
@@ -212,14 +214,17 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
         padding: EdgeInsets.all(8.0),
         height: widget.pickerTheme.pickerHeight,
         decoration: BoxDecoration(color: widget.pickerTheme.backgroundColor),
-        child: CupertinoPicker.builder(
+        child: CupertinoPicker(
           backgroundColor: widget.pickerTheme.backgroundColor,
           scrollController: scrollCtrl,
           itemExtent: widget.pickerTheme.itemHeight,
           onSelectedItemChanged: valueChanged,
-          childCount: valueRange.last - valueRange.first + 1,
-          itemBuilder: (context, index) =>
-              _renderDatePickerItemComponent(valueRange.first + index, format),
+          looping: widget.looping,
+          children: List<Widget>.of(
+            List<int>.generate(valueRange.last - valueRange.first + 1, (i) => i).map(
+              (index) => _renderDatePickerItemComponent(valueRange.first + index, format),
+            ),
+          ),
         ),
       ),
     );
