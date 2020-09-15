@@ -208,35 +208,66 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     @required String format,
     @required ValueChanged<int> valueChanged,
   }) {
+    final isMonth = format.contains('M');
     return Expanded(
       flex: 1,
-      child: Container(
+      child: SizedBox(
         height: widget.pickerTheme.pickerHeight,
-        decoration: BoxDecoration(color: widget.pickerTheme.backgroundColor),
-        child: CupertinoPicker(
-          backgroundColor: widget.pickerTheme.backgroundColor,
-          scrollController: scrollCtrl,
-          itemExtent: widget.pickerTheme.itemHeight,
-          onSelectedItemChanged: valueChanged,
-          looping: widget.looping,
-          children: List<Widget>.of(
-            List<int>.generate(valueRange.last - valueRange.first + 1, (i) => i).map(
-              (index) => _renderDatePickerItemComponent(valueRange.first + index, format),
-            ),
-          ),
+        child: LayoutBuilder(
+          builder: (context, constraint) {
+            return Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  left: isMonth ? 0 : -constraint.maxWidth,
+                  width: constraint.maxWidth * 2,
+                  height: constraint.maxHeight,
+                  child: Container(
+                    decoration: BoxDecoration(color: widget.pickerTheme.backgroundColor),
+                    child: CupertinoPicker(
+                      backgroundColor: widget.pickerTheme.backgroundColor,
+                      scrollController: scrollCtrl,
+                      itemExtent: widget.pickerTheme.itemHeight,
+                      onSelectedItemChanged: valueChanged,
+                      looping: widget.looping,
+                      children: List<Widget>.of(
+                        List<int>.generate(valueRange.last - valueRange.first + 1, (i) => i).map(
+                          (index) => _renderDatePickerItemComponent(valueRange.first + index, format),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
         ),
       ),
     );
   }
 
   Widget _renderDatePickerItemComponent(int value, String format) {
+    final isMonth = format.contains('M');
     return Container(
       height: widget.pickerTheme.itemHeight,
-      alignment: Alignment.center,
-      child: Text(
-        DateTimeFormatter.formatDateTime(value, format, widget.locale),
-        style:
-            widget.pickerTheme.itemTextStyle ?? DATETIME_PICKER_ITEM_TEXT_STYLE,
+      child: Row(
+        children: [
+          if (!isMonth)
+            Expanded(child: SizedBox.shrink()),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              alignment: isMonth ? Alignment.centerRight : Alignment.centerLeft,
+              child: Text(
+                DateTimeFormatter.formatDateTime(value, format, widget.locale),
+                style:
+                    widget.pickerTheme.itemTextStyle ?? DATETIME_PICKER_ITEM_TEXT_STYLE,
+              ),
+            ),
+          ),
+          if (isMonth)
+            Expanded(child: SizedBox.shrink()),
+        ],
       ),
     );
   }
