@@ -256,7 +256,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
             Expanded(child: SizedBox.shrink()),
           Expanded(
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: EdgeInsets.symmetric(horizontal: 12),
               alignment: isMonth ? Alignment.centerRight : Alignment.centerLeft,
               child: Text(
                 DateTimeFormatter.formatDateTime(value, format, widget.locale),
